@@ -9,6 +9,12 @@
 
 namespace neo_usboard_v2 {
 
+vnx::TopicPtr can_frames = vnx::get_topic("neo_usboard_v2", "can_frames");
+vnx::TopicPtr can_request = vnx::get_topic("neo_usboard_v2", "can_request");
+vnx::TopicPtr config = vnx::get_topic("neo_usboard_v2", "config");
+vnx::TopicPtr data = vnx::get_topic("neo_usboard_v2", "data");
+vnx::TopicPtr serial_data = vnx::get_topic("neo_usboard_v2", "serial_data");
+vnx::TopicPtr serial_request = vnx::get_topic("neo_usboard_v2", "serial_request");
 
 static void register_all_types() {
 	vnx::register_type_code(::neo_usboard_v2::ROS_NodeBase::static_create_type_code());

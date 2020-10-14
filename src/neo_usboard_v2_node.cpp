@@ -7,22 +7,15 @@
 
 #include <ros/ros.h>
 
-#include <vnx/Process.h>
+#include <vnx/vnx.h>
 
 #include <pilot/base/CAN_Proxy.h>
 #include <pilot/base/SerialPort.h>
 #include <pilot/usboard/USBoardModule.h>
 #include <pilot/usboard/USBoardModuleClient.hxx>
 
+#include <neo_usboard_v2/package.hxx>
 #include <neo_usboard_v2/ROS_NodeBase.hxx>
-
-
-static const vnx::TopicPtr topic_data = "usboard.data";
-static const vnx::TopicPtr topic_config = "usboard.config";
-static const vnx::TopicPtr topic_can_frames = "usboard.can_frames";
-static const vnx::TopicPtr topic_can_request = "usboard.can_request";
-static const vnx::TopicPtr topic_serial_data = "usboard.serial_data";
-static const vnx::TopicPtr topic_serial_request = "usboard.serial_request";
 
 
 class ROS_Node : public neo_usboard_v2::ROS_NodeBase {
@@ -117,8 +110,8 @@ int main(int argc, char** argv)
 		vnx::Handle<pilot::base::CAN_Proxy> module = new pilot::base::CAN_Proxy("CAN_Proxy");
 		module->device = can_device;
 		module->baud_rate = can_baud_rate;
-		module->input = topic_can_request;
-		module->output = topic_can_frames;
+		module->input = neo_usboard_v2::can_request;
+		module->output = neo_usboard_v2::can_frames;
 		module.start_detached();
 	}
 	else if(!serial_port.empty())
@@ -127,8 +120,8 @@ int main(int argc, char** argv)
 		module->port = serial_port;
 		module->baud_rate = 19200;
 		module->raw_mode = true;
-		module->input = topic_serial_request;
-		module->output = topic_serial_data;
+		module->input = neo_usboard_v2::serial_request;
+		module->output = neo_usboard_v2::serial_data;
 		module.start_detached();
 	}
 	else {
@@ -137,18 +130,18 @@ int main(int argc, char** argv)
 
 	{
 		vnx::Handle<pilot::usboard::USBoardModule> module = new pilot::usboard::USBoardModule("USBoardModule");
-		module->input_can = topic_can_frames;
-		module->input_serial = topic_serial_data;
-		module->topic_can_request = topic_can_request;
-		module->topic_serial_request = topic_serial_request;
-		module->output_data = topic_data;
-		module->output_config = topic_config;
+		module->input_can = neo_usboard_v2::can_frames;
+		module->input_serial = neo_usboard_v2::serial_data;
+		module->topic_can_request = neo_usboard_v2::can_request;
+		module->topic_serial_request = neo_usboard_v2::serial_request;
+		module->output_data = neo_usboard_v2::data;
+		module->output_config = neo_usboard_v2::config;
 		module.start_detached();
 	}
 	{
 		vnx::Handle<ROS_Node> module = new ROS_Node("ROS_Node");
-		module->input_data = topic_data;
-		module->input_config = topic_config;
+		module->input_data = neo_usboard_v2::data;
+		module->input_config = neo_usboard_v2::config;
 		module->update_interval_ms = 1000 / update_rate;
 		module.start_detached();
 	}

@@ -1,0 +1,9 @@
+package neo_usboard_v2;
+
+topic data;
+topic config;
+topic can_frames;
+topic can_request;
+topic serial_data;
+topic serial_request;
+

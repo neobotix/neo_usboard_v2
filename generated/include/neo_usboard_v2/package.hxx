@@ -11,6 +11,12 @@
 
 namespace neo_usboard_v2 {
 
+extern vnx::TopicPtr can_frames;
+extern vnx::TopicPtr can_request;
+extern vnx::TopicPtr config;
+extern vnx::TopicPtr data;
+extern vnx::TopicPtr serial_data;
+extern vnx::TopicPtr serial_request;
 
 class ROS_NodeBase;
 
