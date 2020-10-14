@@ -57,7 +57,7 @@ protected:
 		if(value->transmit_mode == pilot::usboard::USBoardConfig::TRANSMIT_MODE_REQUEST)
 		{
 			// enable request timer
-			set_timeout_millis(update_interval_ms, std::bind(&ROS_Node::update, this));
+			set_timer_millis(update_interval_ms, std::bind(&ROS_Node::update, this));
 		}
 		int i = 0;
 		for(const auto& sensor : value->sensor_config)
