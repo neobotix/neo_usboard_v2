@@ -1,0 +1,9 @@
+[submodule "pilot-base"]
+	path = pilot-base
+	url = https://github.com/neobotix/pilot-base.git
+[submodule "pilot-usboard"]
+	path = pilot-usboard
+	url = https://github.com/neobotix/pilot-usboard.git
+[submodule "vnx-base"]
+	path = vnx-base
+	url = https://github.com/neobotix/vnx-base.git
