@@ -53,8 +53,6 @@ file(GLOB GENERATED_SOURCE_FILES generated/src/*.cpp)
 include_directories(
 	include
 	generated/include
-	pilot-base/include
-	pilot-usboard/include
 	${Boost_INCLUDE_DIRS}
 	${catkin_INCLUDE_DIRS}
 )
