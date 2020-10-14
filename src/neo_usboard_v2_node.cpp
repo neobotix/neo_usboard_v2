@@ -59,7 +59,17 @@ protected:
 			// enable request timer
 			set_timeout_millis(update_interval_ms, std::bind(&ROS_Node::update, this));
 		}
+		int i = 0;
+		for(const auto& sensor : value->sensor_config)
+		{
+			if(sensor.active) {
+				sensor_group_enable[i / 4] = true;		// auto enable group for requests
+			}
+			i++;
+		}
 		config = value;
+
+		ROS_INFO_STREAM("Got USBoardConfig: " << value->to_string());
 	}
 
 	void update()
