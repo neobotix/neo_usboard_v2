@@ -41,7 +41,7 @@ add_subdirectory(pilot-usboard)
 
 catkin_package(
     CATKIN_DEPENDS roscpp std_msgs tf nav_msgs sensor_msgs
-    INCLUDE_DIRS include generated/include
+    INCLUDE_DIRS generated/include
 )
 
 ###########
@@ -51,7 +51,6 @@ catkin_package(
 file(GLOB GENERATED_SOURCE_FILES generated/src/*.cpp)
 
 include_directories(
-	include
 	generated/include
 	${Boost_INCLUDE_DIRS}
 	${catkin_INCLUDE_DIRS}
