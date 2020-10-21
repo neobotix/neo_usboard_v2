@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- Load usboard_v2 params -->
+	<rosparam command="load" ns="usboard_v2" file="$(find neo_usboard_v2)/launch/neo_usboard_v2.yaml"/>
+	<!-- start usboard_v2 node -->
+	<node pkg="neo_usboard_v2" type="neo_usboard_v2" ns="usboard_v2" name="usboard_v2_node" respawn="false" output="screen"/>
+
+</launch>
