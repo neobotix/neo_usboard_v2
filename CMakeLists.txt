@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 	 tf
 	 std_msgs
 	 sensor_msgs
+	 neo_msgs
  )
  
 add_subdirectory(pilot-base)
