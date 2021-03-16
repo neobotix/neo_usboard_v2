@@ -3,8 +3,15 @@
 
 #include <neo_usboard_v2/ROS_NodeBase.hxx>
 
+#include <neo_usboard_v2/package.hxx>
 #include <vnx/vnx.h>
 
+
+
+namespace vnx {
+
+
+} // namespace vnx
 
 
 namespace neo_usboard_v2 {

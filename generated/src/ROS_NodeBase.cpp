@@ -7,20 +7,24 @@
 #include <pilot/usboard/USBoardConfig.hxx>
 #include <pilot/usboard/USBoardData.hxx>
 #include <vnx/Module.h>
-#include <vnx/ModuleInterface_vnx_close.hxx>
-#include <vnx/ModuleInterface_vnx_close_return.hxx>
 #include <vnx/ModuleInterface_vnx_get_config.hxx>
+#include <vnx/ModuleInterface_vnx_get_config_return.hxx>
 #include <vnx/ModuleInterface_vnx_get_config_object.hxx>
 #include <vnx/ModuleInterface_vnx_get_config_object_return.hxx>
-#include <vnx/ModuleInterface_vnx_get_config_return.hxx>
+#include <vnx/ModuleInterface_vnx_get_module_info.hxx>
+#include <vnx/ModuleInterface_vnx_get_module_info_return.hxx>
 #include <vnx/ModuleInterface_vnx_get_type_code.hxx>
 #include <vnx/ModuleInterface_vnx_get_type_code_return.hxx>
 #include <vnx/ModuleInterface_vnx_restart.hxx>
 #include <vnx/ModuleInterface_vnx_restart_return.hxx>
+#include <vnx/ModuleInterface_vnx_self_test.hxx>
+#include <vnx/ModuleInterface_vnx_self_test_return.hxx>
 #include <vnx/ModuleInterface_vnx_set_config.hxx>
+#include <vnx/ModuleInterface_vnx_set_config_return.hxx>
 #include <vnx/ModuleInterface_vnx_set_config_object.hxx>
 #include <vnx/ModuleInterface_vnx_set_config_object_return.hxx>
-#include <vnx/ModuleInterface_vnx_set_config_return.hxx>
+#include <vnx/ModuleInterface_vnx_stop.hxx>
+#include <vnx/ModuleInterface_vnx_stop_return.hxx>
 #include <vnx/TopicPtr.hpp>
 
 #include <vnx/vnx.h>
@@ -35,17 +39,17 @@ const vnx::Hash64 ROS_NodeBase::VNX_CODE_HASH(0xc719729fa44ebd8ull);
 ROS_NodeBase::ROS_NodeBase(const std::string& _vnx_name)
 	:	Module::Module(_vnx_name)
 {
-	vnx::read_config(vnx_name + ".input_config", input_config);
 	vnx::read_config(vnx_name + ".input_data", input_data);
-	vnx::read_config(vnx_name + ".sensor_group_enable", sensor_group_enable);
+	vnx::read_config(vnx_name + ".input_config", input_config);
 	vnx::read_config(vnx_name + ".update_interval_ms", update_interval_ms);
+	vnx::read_config(vnx_name + ".sensor_group_enable", sensor_group_enable);
 }
 
 vnx::Hash64 ROS_NodeBase::get_type_hash() const {
 	return VNX_TYPE_HASH;
 }
 
-const char* ROS_NodeBase::get_type_name() const {
+std::string ROS_NodeBase::get_type_name() const {
 	return "neo_usboard_v2.ROS_Node";
 }
 
@@ -73,23 +77,14 @@ void ROS_NodeBase::write(std::ostream& _out) const {
 }
 
 void ROS_NodeBase::read(std::istream& _in) {
-	std::map<std::string, std::string> _object;
-	vnx::read_object(_in, _object);
-	for(const auto& _entry : _object) {
-		if(_entry.first == "input_config") {
-			vnx::from_string(_entry.second, input_config);
-		} else if(_entry.first == "input_data") {
-			vnx::from_string(_entry.second, input_data);
-		} else if(_entry.first == "sensor_group_enable") {
-			vnx::from_string(_entry.second, sensor_group_enable);
-		} else if(_entry.first == "update_interval_ms") {
-			vnx::from_string(_entry.second, update_interval_ms);
-		}
+	if(auto _json = vnx::read_json(_in)) {
+		from_object(_json->to_object());
 	}
 }
 
 vnx::Object ROS_NodeBase::to_object() const {
 	vnx::Object _object;
+	_object["__type"] = "neo_usboard_v2.ROS_Node";
 	_object["input_data"] = input_data;
 	_object["input_config"] = input_config;
 	_object["update_interval_ms"] = update_interval_ms;
@@ -162,40 +157,45 @@ const vnx::TypeCode* ROS_NodeBase::static_get_type_code() {
 }
 
 std::shared_ptr<vnx::TypeCode> ROS_NodeBase::static_create_type_code() {
-	std::shared_ptr<vnx::TypeCode> type_code = std::make_shared<vnx::TypeCode>();
+	auto type_code = std::make_shared<vnx::TypeCode>();
 	type_code->name = "neo_usboard_v2.ROS_Node";
 	type_code->type_hash = vnx::Hash64(0x82acec9e4080c830ull);
 	type_code->code_hash = vnx::Hash64(0xc719729fa44ebd8ull);
 	type_code->is_native = true;
-	type_code->methods.resize(7);
+	type_code->native_size = sizeof(::neo_usboard_v2::ROS_NodeBase);
+	type_code->methods.resize(9);
 	type_code->methods[0] = ::vnx::ModuleInterface_vnx_get_config_object::static_get_type_code();
 	type_code->methods[1] = ::vnx::ModuleInterface_vnx_get_config::static_get_type_code();
 	type_code->methods[2] = ::vnx::ModuleInterface_vnx_set_config_object::static_get_type_code();
 	type_code->methods[3] = ::vnx::ModuleInterface_vnx_set_config::static_get_type_code();
 	type_code->methods[4] = ::vnx::ModuleInterface_vnx_get_type_code::static_get_type_code();
-	type_code->methods[5] = ::vnx::ModuleInterface_vnx_restart::static_get_type_code();
-	type_code->methods[6] = ::vnx::ModuleInterface_vnx_close::static_get_type_code();
+	type_code->methods[5] = ::vnx::ModuleInterface_vnx_get_module_info::static_get_type_code();
+	type_code->methods[6] = ::vnx::ModuleInterface_vnx_restart::static_get_type_code();
+	type_code->methods[7] = ::vnx::ModuleInterface_vnx_stop::static_get_type_code();
+	type_code->methods[8] = ::vnx::ModuleInterface_vnx_self_test::static_get_type_code();
 	type_code->fields.resize(4);
 	{
-		vnx::TypeField& field = type_code->fields[0];
+		auto& field = type_code->fields[0];
 		field.is_extended = true;
 		field.name = "input_data";
 		field.code = {12, 5};
 	}
 	{
-		vnx::TypeField& field = type_code->fields[1];
+		auto& field = type_code->fields[1];
 		field.is_extended = true;
 		field.name = "input_config";
 		field.code = {12, 5};
 	}
 	{
-		vnx::TypeField& field = type_code->fields[2];
+		auto& field = type_code->fields[2];
+		field.data_size = 4;
 		field.name = "update_interval_ms";
 		field.value = vnx::to_string(200);
 		field.code = {7};
 	}
 	{
-		vnx::TypeField& field = type_code->fields[3];
+		auto& field = type_code->fields[3];
+		field.data_size = 4;
 		field.name = "sensor_group_enable";
 		field.code = {11, 4, 31};
 	}
@@ -203,84 +203,82 @@ std::shared_ptr<vnx::TypeCode> ROS_NodeBase::static_create_type_code() {
 	return type_code;
 }
 
-void ROS_NodeBase::vnx_handle_switch(std::shared_ptr<const vnx::Sample> _sample) {
-	{
-		auto _value = std::dynamic_pointer_cast<const ::pilot::usboard::USBoardData>(_sample->value);
-		if(_value) {
-			handle(_value);
-			return;
+void ROS_NodeBase::vnx_handle_switch(std::shared_ptr<const vnx::Value> _value) {
+	const auto* _type_code = _value->get_type_code();
+	while(_type_code) {
+		switch(_type_code->type_hash) {
+			case 0x9c0fb140354b6e4cull:
+				handle(std::static_pointer_cast<const ::pilot::usboard::USBoardConfig>(_value));
+				return;
+			case 0xbd08b8f30252bcb1ull:
+				handle(std::static_pointer_cast<const ::pilot::usboard::USBoardData>(_value));
+				return;
+			default:
+				_type_code = _type_code->super;
 		}
 	}
-	{
-		auto _value = std::dynamic_pointer_cast<const ::pilot::usboard::USBoardConfig>(_sample->value);
-		if(_value) {
-			handle(_value);
-			return;
-		}
-	}
+	handle(std::static_pointer_cast<const vnx::Value>(_value));
 }
 
 std::shared_ptr<vnx::Value> ROS_NodeBase::vnx_call_switch(std::shared_ptr<const vnx::Value> _method, const vnx::request_id_t& _request_id) {
-	const auto _type_hash = _method->get_type_hash();
-	if(_type_hash == vnx::Hash64(0x17f58f68bf83abc0ull)) {
-		auto _args = std::dynamic_pointer_cast<const ::vnx::ModuleInterface_vnx_get_config_object>(_method);
-		if(!_args) {
-			throw std::logic_error("vnx_call_switch(): !_args");
+	switch(_method->get_type_hash()) {
+		case 0x17f58f68bf83abc0ull: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_get_config_object>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_get_config_object_return::create();
+			_return_value->_ret_0 = vnx_get_config_object();
+			return _return_value;
 		}
-		auto _return_value = ::vnx::ModuleInterface_vnx_get_config_object_return::create();
-		_return_value->_ret_0 = vnx_get_config_object();
-		return _return_value;
-	} else if(_type_hash == vnx::Hash64(0xbbc7f1a01044d294ull)) {
-		auto _args = std::dynamic_pointer_cast<const ::vnx::ModuleInterface_vnx_get_config>(_method);
-		if(!_args) {
-			throw std::logic_error("vnx_call_switch(): !_args");
+		case 0xbbc7f1a01044d294ull: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_get_config>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_get_config_return::create();
+			_return_value->_ret_0 = vnx_get_config(_args->name);
+			return _return_value;
 		}
-		auto _return_value = ::vnx::ModuleInterface_vnx_get_config_return::create();
-		_return_value->_ret_0 = vnx_get_config(_args->name);
-		return _return_value;
-	} else if(_type_hash == vnx::Hash64(0xca30f814f17f322full)) {
-		auto _args = std::dynamic_pointer_cast<const ::vnx::ModuleInterface_vnx_set_config_object>(_method);
-		if(!_args) {
-			throw std::logic_error("vnx_call_switch(): !_args");
+		case 0xca30f814f17f322full: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_set_config_object>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_set_config_object_return::create();
+			vnx_set_config_object(_args->config);
+			return _return_value;
 		}
-		auto _return_value = ::vnx::ModuleInterface_vnx_set_config_object_return::create();
-		vnx_set_config_object(_args->config);
-		return _return_value;
-	} else if(_type_hash == vnx::Hash64(0x362aac91373958b7ull)) {
-		auto _args = std::dynamic_pointer_cast<const ::vnx::ModuleInterface_vnx_set_config>(_method);
-		if(!_args) {
-			throw std::logic_error("vnx_call_switch(): !_args");
+		case 0x362aac91373958b7ull: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_set_config>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_set_config_return::create();
+			vnx_set_config(_args->name, _args->value);
+			return _return_value;
 		}
-		auto _return_value = ::vnx::ModuleInterface_vnx_set_config_return::create();
-		vnx_set_config(_args->name, _args->value);
-		return _return_value;
-	} else if(_type_hash == vnx::Hash64(0x305ec4d628960e5dull)) {
-		auto _args = std::dynamic_pointer_cast<const ::vnx::ModuleInterface_vnx_get_type_code>(_method);
-		if(!_args) {
-			throw std::logic_error("vnx_call_switch(): !_args");
+		case 0x305ec4d628960e5dull: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_get_type_code>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_get_type_code_return::create();
+			_return_value->_ret_0 = vnx_get_type_code();
+			return _return_value;
 		}
-		auto _return_value = ::vnx::ModuleInterface_vnx_get_type_code_return::create();
-		_return_value->_ret_0 = vnx_get_type_code();
-		return _return_value;
-	} else if(_type_hash == vnx::Hash64(0x9e95dc280cecca1bull)) {
-		auto _args = std::dynamic_pointer_cast<const ::vnx::ModuleInterface_vnx_restart>(_method);
-		if(!_args) {
-			throw std::logic_error("vnx_call_switch(): !_args");
+		case 0xf6d82bdf66d034a1ull: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_get_module_info>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_get_module_info_return::create();
+			_return_value->_ret_0 = vnx_get_module_info();
+			return _return_value;
 		}
-		auto _return_value = ::vnx::ModuleInterface_vnx_restart_return::create();
-		vnx_restart();
-		return _return_value;
-	} else if(_type_hash == vnx::Hash64(0x9e165e2b50bad84bull)) {
-		auto _args = std::dynamic_pointer_cast<const ::vnx::ModuleInterface_vnx_close>(_method);
-		if(!_args) {
-			throw std::logic_error("vnx_call_switch(): !_args");
+		case 0x9e95dc280cecca1bull: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_restart>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_restart_return::create();
+			vnx_restart();
+			return _return_value;
 		}
-		auto _return_value = ::vnx::ModuleInterface_vnx_close_return::create();
-		vnx_close();
-		return _return_value;
+		case 0x7ab49ce3d1bfc0d2ull: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_stop>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_stop_return::create();
+			vnx_stop();
+			return _return_value;
+		}
+		case 0x6ce3775b41a42697ull: {
+			auto _args = std::static_pointer_cast<const ::vnx::ModuleInterface_vnx_self_test>(_method);
+			auto _return_value = ::vnx::ModuleInterface_vnx_self_test_return::create();
+			_return_value->_ret_0 = vnx_self_test();
+			return _return_value;
+		}
 	}
 	auto _ex = vnx::NoSuchMethod::create();
-	_ex->dst_mac = vnx_request ? vnx_request->dst_mac : 0;
+	_ex->dst_mac = vnx_request ? vnx_request->dst_mac : vnx::Hash64();
 	_ex->method = _method->get_type_name();
 	return _ex;
 }
@@ -308,31 +306,29 @@ void read(TypeInput& in, ::neo_usboard_v2::ROS_NodeBase& value, const TypeCode* 
 		}
 	}
 	if(!type_code) {
-		throw std::logic_error("read(): type_code == 0");
+		vnx::skip(in, type_code, code);
+		return;
 	}
 	if(code) {
 		switch(code[0]) {
 			case CODE_STRUCT: type_code = type_code->depends[code[1]]; break;
 			case CODE_ALT_STRUCT: type_code = type_code->depends[vnx::flip_bytes(code[1])]; break;
-			default: vnx::skip(in, type_code, code); return;
+			default: {
+				vnx::skip(in, type_code, code);
+				return;
+			}
 		}
 	}
 	const char* const _buf = in.read(type_code->total_field_size);
 	if(type_code->is_matched) {
-		{
-			const vnx::TypeField* const _field = type_code->field_map[2];
-			if(_field) {
-				vnx::read_value(_buf + _field->offset, value.update_interval_ms, _field->code.data());
-			}
+		if(const auto* const _field = type_code->field_map[2]) {
+			vnx::read_value(_buf + _field->offset, value.update_interval_ms, _field->code.data());
 		}
-		{
-			const vnx::TypeField* const _field = type_code->field_map[3];
-			if(_field) {
-				vnx::read_value(_buf + _field->offset, value.sensor_group_enable, _field->code.data());
-			}
+		if(const auto* const _field = type_code->field_map[3]) {
+			vnx::read_value(_buf + _field->offset, value.sensor_group_enable, _field->code.data());
 		}
 	}
-	for(const vnx::TypeField* _field : type_code->ext_fields) {
+	for(const auto* _field : type_code->ext_fields) {
 		switch(_field->native_index) {
 			case 0: vnx::read(in, value.input_data, type_code, _field->code.data()); break;
 			case 1: vnx::read(in, value.input_config, type_code, _field->code.data()); break;
@@ -351,7 +347,7 @@ void write(TypeOutput& out, const ::neo_usboard_v2::ROS_NodeBase& value, const T
 		out.write_type_code(type_code);
 		vnx::write_class_header<::neo_usboard_v2::ROS_NodeBase>(out);
 	}
-	if(code && code[0] == CODE_STRUCT) {
+	else if(code && code[0] == CODE_STRUCT) {
 		type_code = type_code->depends[code[1]];
 	}
 	char* const _buf = out.write(8);

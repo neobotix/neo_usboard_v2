@@ -55,9 +55,6 @@ struct type<::neo_usboard_v2::ROS_NodeBase> {
 	void accept(Visitor& visitor, const ::neo_usboard_v2::ROS_NodeBase& value) {
 		vnx::accept(visitor, value);
 	}
-	void create_dynamic_code(std::vector<uint16_t>& code) {
-		code.push_back(CODE_OBJECT);
-	}
 };
 
 
