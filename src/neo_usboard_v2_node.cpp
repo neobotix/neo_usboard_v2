@@ -35,8 +35,7 @@ protected:
 		subscribe(input_data);
 		subscribe(input_config);
 
-		// request USBoardConfig
-		usboard_sync.request_config();
+		set_timer_millis(1000, std::bind(&ROS_Node::request_config, this));
 
 		Super::main();
 
@@ -106,6 +105,17 @@ protected:
 		// also request analog data if enabled
 		if(config && config->enable_analog_input) {
 			usboard_sync.request_analog_data();
+		}
+	}
+
+	void request_config()
+	{
+		try {
+			if(!config) {
+				usboard_sync.request_config();
+			}
+		} catch(...) {
+			// no problem
 		}
 	}
 
