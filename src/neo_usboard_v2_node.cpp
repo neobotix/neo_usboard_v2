@@ -44,26 +44,26 @@ protected:
 
 	void handle(std::shared_ptr<const pilot::usboard::USBoardData> value) override
 	{
-		// TODO: convert and publish on ROS
 		neo_msgs::USBoardV2 usBoard;
 		usBoard.header.stamp = ros::Time::now();
 		usBoard.header.frame_id = "USSensors";
 		
 		for(int i=0; i < 16; i++)
 		{
-			sensor_msgs::Range USRangeMsg;
-			usBoard.active[i] = config->sensor_config[i].active;
-			USRangeMsg.header.stamp = ros::Time::now(); 		//time
-			USRangeMsg.header.frame_id = "usrangesensor"+std::to_string(i);		//string
-			USRangeMsg.radiation_type = 0; 			//uint8   => Enum ULTRASOUND=0; INFRARED=1
-			USRangeMsg.field_of_view = 2.3; 		//float32 [rad]
-			USRangeMsg.min_range = 0.2; 			//float32 [m]
-			USRangeMsg.max_range = 3.0; 			//float32 [m]
-			USRangeMsg.range = value->sensor[i]; 	//float32 [m]
+			const bool is_active = config && config->sensor_config[i].active;
+			usBoard.active[i] = is_active;
 
-			//publish data for first USrange sensor
-			if(config->sensor_config[i].active)
+			if(is_active)
 			{
+				sensor_msgs::Range USRangeMsg;
+				USRangeMsg.header.stamp = ros::Time::now(); 		//time
+				USRangeMsg.header.frame_id = "usrangesensor"+std::to_string(i);		//string
+				USRangeMsg.radiation_type = 0; 			//uint8   => Enum ULTRASOUND=0; INFRARED=1
+				USRangeMsg.field_of_view = 2.3; 		//float32 [rad]
+				USRangeMsg.min_range = 0.2; 			//float32 [m]
+				USRangeMsg.max_range = 3.0; 			//float32 [m]
+				USRangeMsg.range = value->sensor[i]; 	//float32 [m]
+
 				topicPub_USRangeSensor[i].publish(USRangeMsg);
 			}
 			usBoard.sensor[i] = value->sensor[i];
