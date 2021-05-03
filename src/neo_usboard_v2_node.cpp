@@ -155,6 +155,7 @@ int main(int argc, char** argv)
 		module->input = neo_usboard_v2::can_request;
 		module->output = neo_usboard_v2::can_frames;
 		module.start_detached();
+		ROS_INFO_STREAM("Started " << module.get_name() << " on " << can_device);
 	}
 	else if(!serial_port.empty())
 	{
@@ -165,6 +166,7 @@ int main(int argc, char** argv)
 		module->input = neo_usboard_v2::serial_request;
 		module->output = neo_usboard_v2::serial_data;
 		module.start_detached();
+		ROS_INFO_STREAM("Started " << module.get_name() << " on " << serial_port);
 	}
 	else {
 		ROS_WARN("No serial port or CAN device configured!");
