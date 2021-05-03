@@ -21,7 +21,7 @@
 class ROS_Node : public neo_usboard_v2::ROS_NodeBase {
 public:
 	ros::NodeHandle nh;
-	ros::Publisher topicPub_usBoard = nh.advertise<neo_msgs::USBoardV2>(topic_path + "/measurements", 1);
+	ros::Publisher topicPub_usBoard;
 	ros::Publisher topicPub_USRangeSensor[16];
 
 	ROS_Node(const std::string& _vnx_name)
@@ -37,6 +37,8 @@ protected:
 		subscribe(input_config);
 
 		set_timer_millis(1000, std::bind(&ROS_Node::request_config, this));
+
+		topicPub_usBoard = nh.advertise<neo_msgs::USBoardV2>(topic_path + "/measurements", 1);
 
 		Super::main();
 
