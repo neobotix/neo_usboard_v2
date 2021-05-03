@@ -23,6 +23,7 @@ public:
 	ros::NodeHandle nh;
 	ros::Publisher topicPub_usBoard = nh.advertise<neo_msgs::USBoardV2>("/usboard_v2/measurements",1);
 	ros::Publisher topicPub_USRangeSensor[16];
+
 	ROS_Node(const std::string& _vnx_name)
 		:	ROS_NodeBase(_vnx_name),
 			usboard_sync("USBoardModule")
@@ -116,8 +117,8 @@ protected:
 			if(!config) {
 				usboard_sync.request_config();
 			}
-		} catch(...) {
-			// no problem
+		} catch(const std::exception& ex) {
+			ROS_ERROR_STREAM("Failed to get USBoardConfig: " << ex.what());
 		}
 	}
 
