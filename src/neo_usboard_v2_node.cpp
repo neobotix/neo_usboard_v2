@@ -21,7 +21,7 @@
 class ROS_Node : public neo_usboard_v2::ROS_NodeBase {
 public:
 	ros::NodeHandle nh;
-	ros::Publisher topicPub_usBoard = nh.advertise<neo_msgs::USBoardV2>("/usboard_v2/measurements",1);
+	ros::Publisher topicPub_usBoard = nh.advertise<neo_msgs::USBoardV2>(topic_path + "/measurements", 1);
 	ros::Publisher topicPub_USRangeSensor[16];
 
 	ROS_Node(const std::string& _vnx_name)
@@ -92,7 +92,7 @@ protected:
 			if(sensor.active) {
 				sensor_group_enable[i / 4] = true;		// auto enable group for requests
 			}
-			topicPub_USRangeSensor[i] = nh.advertise<sensor_msgs::Range>("/usboard_v2/sensor"+std::to_string(i),1);
+			topicPub_USRangeSensor[i] = nh.advertise<sensor_msgs::Range>(topic_path + "/sensor"+std::to_string(i),1);
 			i++;
 		}
 		config = value;
@@ -142,11 +142,15 @@ int main(int argc, char** argv)
 
 	std::string can_device;
 	std::string serial_port;
+	std::string topic_path;
+	int can_id = 0;
 	int can_baud_rate = 0;
 	double update_rate = 0;
 
 	nh.param<std::string>("can_device", can_device, "");
 	nh.param<std::string>("serial_port", serial_port, "/dev/ttyUSB0");
+	nh.param<std::string>("topic_path", topic_path, "/usboard_v2");
+	nh.param<int>("can_id", can_id, 1024);
 	nh.param<int>("can_baud_rate", can_baud_rate, 1000000);
 	nh.param<double>("update_rate", update_rate, 5.);
 
@@ -183,6 +187,7 @@ int main(int argc, char** argv)
 		module->topic_serial_request = neo_usboard_v2::serial_request;
 		module->output_data = neo_usboard_v2::data;
 		module->output_config = neo_usboard_v2::config;
+		module->can_id = can_id;
 		module.start_detached();
 	}
 	{
@@ -190,6 +195,7 @@ int main(int argc, char** argv)
 		module->input_data = neo_usboard_v2::data;
 		module->input_config = neo_usboard_v2::config;
 		module->update_interval_ms = 1000 / update_rate;
+		module->topic_path = topic_path;
 		module.start_detached();
 	}
 

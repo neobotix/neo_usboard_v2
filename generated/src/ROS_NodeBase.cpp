@@ -34,13 +34,14 @@ namespace neo_usboard_v2 {
 
 
 const vnx::Hash64 ROS_NodeBase::VNX_TYPE_HASH(0x82acec9e4080c830ull);
-const vnx::Hash64 ROS_NodeBase::VNX_CODE_HASH(0xc719729fa44ebd8ull);
+const vnx::Hash64 ROS_NodeBase::VNX_CODE_HASH(0x8680ac2a2e87d646ull);
 
 ROS_NodeBase::ROS_NodeBase(const std::string& _vnx_name)
 	:	Module::Module(_vnx_name)
 {
 	vnx::read_config(vnx_name + ".input_data", input_data);
 	vnx::read_config(vnx_name + ".input_config", input_config);
+	vnx::read_config(vnx_name + ".topic_path", topic_path);
 	vnx::read_config(vnx_name + ".update_interval_ms", update_interval_ms);
 	vnx::read_config(vnx_name + ".sensor_group_enable", sensor_group_enable);
 }
@@ -62,8 +63,9 @@ void ROS_NodeBase::accept(vnx::Visitor& _visitor) const {
 	_visitor.type_begin(*_type_code);
 	_visitor.type_field(_type_code->fields[0], 0); vnx::accept(_visitor, input_data);
 	_visitor.type_field(_type_code->fields[1], 1); vnx::accept(_visitor, input_config);
-	_visitor.type_field(_type_code->fields[2], 2); vnx::accept(_visitor, update_interval_ms);
-	_visitor.type_field(_type_code->fields[3], 3); vnx::accept(_visitor, sensor_group_enable);
+	_visitor.type_field(_type_code->fields[2], 2); vnx::accept(_visitor, topic_path);
+	_visitor.type_field(_type_code->fields[3], 3); vnx::accept(_visitor, update_interval_ms);
+	_visitor.type_field(_type_code->fields[4], 4); vnx::accept(_visitor, sensor_group_enable);
 	_visitor.type_end(*_type_code);
 }
 
@@ -71,6 +73,7 @@ void ROS_NodeBase::write(std::ostream& _out) const {
 	_out << "{";
 	_out << "\"input_data\": "; vnx::write(_out, input_data);
 	_out << ", \"input_config\": "; vnx::write(_out, input_config);
+	_out << ", \"topic_path\": "; vnx::write(_out, topic_path);
 	_out << ", \"update_interval_ms\": "; vnx::write(_out, update_interval_ms);
 	_out << ", \"sensor_group_enable\": "; vnx::write(_out, sensor_group_enable);
 	_out << "}";
@@ -87,6 +90,7 @@ vnx::Object ROS_NodeBase::to_object() const {
 	_object["__type"] = "neo_usboard_v2.ROS_Node";
 	_object["input_data"] = input_data;
 	_object["input_config"] = input_config;
+	_object["topic_path"] = topic_path;
 	_object["update_interval_ms"] = update_interval_ms;
 	_object["sensor_group_enable"] = sensor_group_enable;
 	return _object;
@@ -100,6 +104,8 @@ void ROS_NodeBase::from_object(const vnx::Object& _object) {
 			_entry.second.to(input_data);
 		} else if(_entry.first == "sensor_group_enable") {
 			_entry.second.to(sensor_group_enable);
+		} else if(_entry.first == "topic_path") {
+			_entry.second.to(topic_path);
 		} else if(_entry.first == "update_interval_ms") {
 			_entry.second.to(update_interval_ms);
 		}
@@ -112,6 +118,9 @@ vnx::Variant ROS_NodeBase::get_field(const std::string& _name) const {
 	}
 	if(_name == "input_config") {
 		return vnx::Variant(input_config);
+	}
+	if(_name == "topic_path") {
+		return vnx::Variant(topic_path);
 	}
 	if(_name == "update_interval_ms") {
 		return vnx::Variant(update_interval_ms);
@@ -127,6 +136,8 @@ void ROS_NodeBase::set_field(const std::string& _name, const vnx::Variant& _valu
 		_value.to(input_data);
 	} else if(_name == "input_config") {
 		_value.to(input_config);
+	} else if(_name == "topic_path") {
+		_value.to(topic_path);
 	} else if(_name == "update_interval_ms") {
 		_value.to(update_interval_ms);
 	} else if(_name == "sensor_group_enable") {
@@ -160,7 +171,7 @@ std::shared_ptr<vnx::TypeCode> ROS_NodeBase::static_create_type_code() {
 	auto type_code = std::make_shared<vnx::TypeCode>();
 	type_code->name = "neo_usboard_v2.ROS_Node";
 	type_code->type_hash = vnx::Hash64(0x82acec9e4080c830ull);
-	type_code->code_hash = vnx::Hash64(0xc719729fa44ebd8ull);
+	type_code->code_hash = vnx::Hash64(0x8680ac2a2e87d646ull);
 	type_code->is_native = true;
 	type_code->native_size = sizeof(::neo_usboard_v2::ROS_NodeBase);
 	type_code->methods.resize(9);
@@ -173,7 +184,7 @@ std::shared_ptr<vnx::TypeCode> ROS_NodeBase::static_create_type_code() {
 	type_code->methods[6] = ::vnx::ModuleInterface_vnx_restart::static_get_type_code();
 	type_code->methods[7] = ::vnx::ModuleInterface_vnx_stop::static_get_type_code();
 	type_code->methods[8] = ::vnx::ModuleInterface_vnx_self_test::static_get_type_code();
-	type_code->fields.resize(4);
+	type_code->fields.resize(5);
 	{
 		auto& field = type_code->fields[0];
 		field.is_extended = true;
@@ -188,13 +199,20 @@ std::shared_ptr<vnx::TypeCode> ROS_NodeBase::static_create_type_code() {
 	}
 	{
 		auto& field = type_code->fields[2];
+		field.is_extended = true;
+		field.name = "topic_path";
+		field.value = vnx::to_string("/usboard_v2");
+		field.code = {32};
+	}
+	{
+		auto& field = type_code->fields[3];
 		field.data_size = 4;
 		field.name = "update_interval_ms";
 		field.value = vnx::to_string(200);
 		field.code = {7};
 	}
 	{
-		auto& field = type_code->fields[3];
+		auto& field = type_code->fields[4];
 		field.data_size = 4;
 		field.name = "sensor_group_enable";
 		field.code = {11, 4, 31};
@@ -321,10 +339,10 @@ void read(TypeInput& in, ::neo_usboard_v2::ROS_NodeBase& value, const TypeCode* 
 	}
 	const char* const _buf = in.read(type_code->total_field_size);
 	if(type_code->is_matched) {
-		if(const auto* const _field = type_code->field_map[2]) {
+		if(const auto* const _field = type_code->field_map[3]) {
 			vnx::read_value(_buf + _field->offset, value.update_interval_ms, _field->code.data());
 		}
-		if(const auto* const _field = type_code->field_map[3]) {
+		if(const auto* const _field = type_code->field_map[4]) {
 			vnx::read_value(_buf + _field->offset, value.sensor_group_enable, _field->code.data());
 		}
 	}
@@ -332,6 +350,7 @@ void read(TypeInput& in, ::neo_usboard_v2::ROS_NodeBase& value, const TypeCode* 
 		switch(_field->native_index) {
 			case 0: vnx::read(in, value.input_data, type_code, _field->code.data()); break;
 			case 1: vnx::read(in, value.input_config, type_code, _field->code.data()); break;
+			case 2: vnx::read(in, value.topic_path, type_code, _field->code.data()); break;
 			default: vnx::skip(in, type_code, _field->code.data());
 		}
 	}
@@ -355,6 +374,7 @@ void write(TypeOutput& out, const ::neo_usboard_v2::ROS_NodeBase& value, const T
 	vnx::write_value(_buf + 4, value.sensor_group_enable);
 	vnx::write(out, value.input_data, type_code, type_code->fields[0].code.data());
 	vnx::write(out, value.input_config, type_code, type_code->fields[1].code.data());
+	vnx::write(out, value.topic_path, type_code, type_code->fields[2].code.data());
 }
 
 void read(std::istream& in, ::neo_usboard_v2::ROS_NodeBase& value) {

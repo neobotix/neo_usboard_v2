@@ -5,6 +5,8 @@ module ROS_Node {
 	vnx.TopicPtr input_data;
 	vnx.TopicPtr input_config;
 	
+	string topic_path = "/usboard_v2";		// output topic namespace
+	
 	int update_interval_ms = 200;			// data request interval [ms]
 	
 	bool sensor_group_enable[4];			// which sensor groups should be requested (default = all)

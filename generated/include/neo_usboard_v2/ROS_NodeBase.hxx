@@ -18,6 +18,7 @@ public:
 	
 	::vnx::TopicPtr input_data;
 	::vnx::TopicPtr input_config;
+	std::string topic_path = "/usboard_v2";
 	int32_t update_interval_ms = 200;
 	std::array<vnx::bool_t, 4> sensor_group_enable = {};
 	
