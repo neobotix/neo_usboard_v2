@@ -138,7 +138,7 @@ int main(int argc, char** argv)
 	// initialize VNX
 	vnx::init("neo_usboard_v2_node", 0, nullptr);
 
-	ros::NodeHandle nh("/usboard_v2");
+	ros::NodeHandle nh;
 
 	std::string can_device;
 	std::string serial_port;
