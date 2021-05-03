@@ -64,7 +64,9 @@ protected:
 				USRangeMsg.max_range = 3.0; 			//float32 [m]
 				USRangeMsg.range = value->sensor[i]; 	//float32 [m]
 
-				topicPub_USRangeSensor[i].publish(USRangeMsg);
+				if(topicPub_USRangeSensor[i]) {
+					topicPub_USRangeSensor[i].publish(USRangeMsg);
+				}
 			}
 			usBoard.sensor[i] = value->sensor[i];
 		}
