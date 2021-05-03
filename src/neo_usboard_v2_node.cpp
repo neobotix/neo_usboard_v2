@@ -138,17 +138,17 @@ int main(int argc, char** argv)
 	// initialize VNX
 	vnx::init("neo_usboard_v2_node", 0, nullptr);
 
-	ros::NodeHandle nh_private("~");
+	ros::NodeHandle nh("/usboard_v2");
 
 	std::string can_device;
 	std::string serial_port;
 	int can_baud_rate = 0;
 	double update_rate = 0;
 
-	nh_private.param<std::string>("can_device", can_device, "");
-	nh_private.param<std::string>("serial_port", serial_port, "/dev/ttyUSB0");
-	nh_private.param<int>("can_baud_rate", can_baud_rate, 1000000);
-	nh_private.param<double>("update_rate", update_rate, 5.);
+	nh.param<std::string>("can_device", can_device, "");
+	nh.param<std::string>("serial_port", serial_port, "/dev/ttyUSB0");
+	nh.param<int>("can_baud_rate", can_baud_rate, 1000000);
+	nh.param<double>("update_rate", update_rate, 5.);
 
 	if(!can_device.empty())
 	{
