@@ -4,5 +4,10 @@
 	<rosparam command="load" ns="usboard_v2" file="$(find neo_usboard_v2)/launch/neo_usboard_v2.yaml"/>
 	<!-- start usboard_v2 node -->
 	<node pkg="neo_usboard_v2" type="neo_usboard_v2" ns="usboard_v2" name="usboard_v2_node" respawn="false" output="screen"/>
+	
+	<!-- Load usboard_v2 params for second board -->
+	<!--<rosparam command="load" ns="usboard_v2_1" file="$(find neo_usboard_v2)/launch/neo_usboard_v2_1.yaml"/>-->
+	<!-- start usboard_v2 node for second board -->
+	<!--<node pkg="neo_usboard_v2" type="neo_usboard_v2" ns="usboard_v2_1" name="usboard_v2_node_1" respawn="false" output="screen"/>-->
 
 </launch>
