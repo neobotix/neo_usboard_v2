@@ -246,51 +246,54 @@ protected:
 
 	void reconfigureCB(neo_usboard_v2::neo_usboard_v2Config &val, uint32_t level)
 	{
-		active_sensors = {val.a_s0, val.a_s1, val.a_s2, val.a_s3, val.a_s4,
+		if(ros_params_initialized) {
+			active_sensors = {val.a_s0, val.a_s1, val.a_s2, val.a_s3, val.a_s4,
 			val.a_s5, val.a_s6, val.a_s7, val.a_s8, val.a_s9, val.a_s10,
 			val.a_s11, val.a_s12, val.a_s13, val.a_s14, val.a_s15 };
 		
-		warn_distance = {val.w_d0, val.w_d1, val.w_d2, val.w_d3, val.w_d4,
-			val.w_d5, val.w_d6, val.w_d7, val.w_d8, val.w_d9, val.w_d10,
-			val.w_d11, val.w_d12, val.w_d13, val.w_d14, val.w_d15 };
-		
-		alarm_distance = {val.a_d0, val.a_d1, val.a_d2, val.a_d3, val.a_d4,
-			val.a_d5, val.a_d6, val.a_d7, val.a_d8, val.a_d9, val.a_d10,
-			val.a_d11, val.a_d12, val.a_d13, val.a_d14, val.a_d15 };
+			warn_distance = {val.w_d0, val.w_d1, val.w_d2, val.w_d3, val.w_d4,
+				val.w_d5, val.w_d6, val.w_d7, val.w_d8, val.w_d9, val.w_d10,
+				val.w_d11, val.w_d12, val.w_d13, val.w_d14, val.w_d15 };
+			
+			alarm_distance = {val.a_d0, val.a_d1, val.a_d2, val.a_d3, val.a_d4,
+				val.a_d5, val.a_d6, val.a_d7, val.a_d8, val.a_d9, val.a_d10,
+				val.a_d11, val.a_d12, val.a_d13, val.a_d14, val.a_d15 };
 
-		enable_transmission = {val.ent_0, val.ent_1, val.ent_2, val.ent_3};
-		fire_interval_ms = {val.ft_0, val.ft_1, val.ft_2, val.ft_3};
-		sending_sensor = {val.sn_0, val.sn_1, val.sn_2, val.sn_3};
-		cross_echo_mode = {val.ee_0, val.ee_1, val.ee_2, val.ee_3};
+			enable_transmission = {val.ent_0, val.ent_1, val.ent_2, val.ent_3};
+			fire_interval_ms = {val.ft_0, val.ft_1, val.ft_2, val.ft_3};
+			sending_sensor = {val.sn_0, val.sn_1, val.sn_2, val.sn_3};
+			cross_echo_mode = {val.ee_0, val.ee_1, val.ee_2, val.ee_3};
 
-		can_device = val.can_device;
-		serial_port = val.serial_port;
-		topic_path = val.topic_path;
-		serial_number = val.serial_number;
-		hardware_version = val.hardware_version;
-		can_id = val.can_id;
-		can_baud_rate = val.can_baud_rate;
-		update_rate = val.update_rate;
+			can_device = val.can_device;
+			serial_port = val.serial_port;
+			topic_path = val.topic_path;
+			serial_number = val.serial_number;
+			hardware_version = val.hardware_version;
+			can_id = val.can_id;
+			can_baud_rate = val.can_baud_rate;
+			update_rate = val.update_rate;
 
-		low_pass_gain = val.low_pass_gain;
-		enable_analog_input = val.enable_analog_input;
-		enable_legacy_format = val.enable_legacy_format;
-		enable_can_termination = val.enable_can_termination;
-		relay_warn_blocked_invert = val.relay_warn_blocked_invert;
-		relay_alarm_blocked_invert = val.relay_alarm_blocked_invert;
+			low_pass_gain = val.low_pass_gain;
+			enable_analog_input = val.enable_analog_input;
+			enable_legacy_format = val.enable_legacy_format;
+			enable_can_termination = val.enable_can_termination;
+			relay_warn_blocked_invert = val.relay_warn_blocked_invert;
+			relay_alarm_blocked_invert = val.relay_alarm_blocked_invert;
 
-		std::shared_ptr<pilot::usboard::USBoardConfig> new_config = vnx::clone(config);
-		set_pilot_params(new_config);
-		{
-			std::lock_guard<std::mutex> lock(mutex_usboard_sync);
-			std::cout << "Updating parameter config: " << new_config->to_string() << std::endl;
-			try{
-				usboard_sync.send_config(new_config);
-				config = new_config;
-			}catch(const std::exception &err){
-				ROS_WARN("Sending USBoard config failed with: %s", err.what());
+			std::shared_ptr<pilot::usboard::USBoardConfig> new_config = vnx::clone(config);
+			set_pilot_params(new_config);
+			{
+				std::lock_guard<std::mutex> lock(mutex_usboard_sync);
+				std::cout << "Updating parameter config: " << new_config->to_string() << std::endl;
+				try{
+					usboard_sync.send_config(new_config);
+					config = new_config;
+				}catch(const std::exception &err){
+					ROS_WARN("Sending USBoard config failed with: %s", err.what());
+				}
 			}
 		}
+		
 	}
 
 private:
