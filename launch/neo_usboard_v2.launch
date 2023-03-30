@@ -3,7 +3,7 @@
 	<!-- Load usboard_v2 params -->
 	<rosparam command="load" ns="usboard_v2" file="$(find neo_usboard_v2)/launch/neo_usboard_v2.yaml"/>
 	<!-- start usboard_v2 node -->
-	<node pkg="neo_usboard_v2" type="neo_usboard_v2" ns="usboard_v2" name="usboard_v2_node" respawn="false" output="screen"/>
+	<node pkg="neo_usboard_v2" type="neo_usboard_v2" ns="usboard_v2" name="usboard_v2_node" respawn="false" args="cfg/neo_usboard_v2.cfg" output="screen"/>
 	
 	<!-- Load usboard_v2 params for second board -->
 	<!--<rosparam command="load" ns="usboard_v2_1" file="$(find neo_usboard_v2)/launch/neo_usboard_v2_1.yaml"/>-->

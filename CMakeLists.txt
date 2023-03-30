@@ -17,7 +17,12 @@ find_package(catkin REQUIRED COMPONENTS
 	 std_msgs
 	 sensor_msgs
 	 neo_msgs
+	 dynamic_reconfigure
  )
+
+generate_dynamic_reconfigure_options(
+  cfg/neo_usboard_v2.cfg
+)
  
 add_subdirectory(pilot-base)
 add_subdirectory(pilot-usboard)
@@ -41,7 +46,7 @@ add_subdirectory(pilot-usboard)
 ###################################
 
 catkin_package(
-    CATKIN_DEPENDS roscpp std_msgs tf nav_msgs sensor_msgs
+    CATKIN_DEPENDS roscpp std_msgs tf nav_msgs sensor_msgs dynamic_reconfigure
     INCLUDE_DIRS generated/include
 )
 
