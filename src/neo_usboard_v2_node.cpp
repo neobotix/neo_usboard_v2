@@ -58,7 +58,7 @@ public:
 
 	void set_ros_params(std::shared_ptr<const pilot::usboard::USBoardConfig> value)
 	{
-		// prevent our own changes from triggering lots of param updates
+		// prevenable_transmission our own changes from triggering lots of param updates
 		ros_params_initialized = false;
 
 		serial_number = value->serial_number;
@@ -123,7 +123,7 @@ protected:
 
 		set_timer_millis(1000, std::bind(&ROS_Node::request_config, this));
 
-		topicPub_usBoard = nh_.advertise<neo_msgs::USBoardV2>(topic_path + "/measurements", 1);
+		topicPub_usBoard = nh_.advertise<neo_msgs::USBoardV2>(topic_path + "/measuremenable_transmissions", 1);
 
     	server = new dynamic_reconfigure::Server<neo_usboard_v2::neo_usboard_v2Config>(nh_);	
 		dynamic_reconfigure::Server<neo_usboard_v2::neo_usboard_v2Config>::CallbackType cb=
@@ -177,6 +177,7 @@ protected:
 		{
 			// enable request timer
 			set_timer_millis(update_interval_ms, std::bind(&ROS_Node::update, this));
+			
 		}
 		int i = 0;
 		for(const auto& sensor : value->sensor_config)
@@ -188,7 +189,7 @@ protected:
 			i++;
 		}
 		config = value;
-
+               set_ros_params(value);
 		ROS_INFO_STREAM("Got USBoardConfig: " << value->to_string());
 	}
 
@@ -207,6 +208,7 @@ protected:
 
 	void request_config()
 	{
+		std::lock_guard<std::mutex> lock(mutex_usboard_sync);
 		try {
 			if(!config) {
 				usboard_sync.request_config();
@@ -247,28 +249,34 @@ protected:
 	void reconfigureCB(neo_usboard_v2::neo_usboard_v2Config &val, uint32_t level)
 	{
 		if(ros_params_initialized) {
-			active_sensors = {val.a_s0, val.a_s1, val.a_s2, val.a_s3, val.a_s4,
-			val.a_s5, val.a_s6, val.a_s7, val.a_s8, val.a_s9, val.a_s10,
-			val.a_s11, val.a_s12, val.a_s13, val.a_s14, val.a_s15 };
-		
-			warn_distance = {val.w_d0, val.w_d1, val.w_d2, val.w_d3, val.w_d4,
-				val.w_d5, val.w_d6, val.w_d7, val.w_d8, val.w_d9, val.w_d10,
-				val.w_d11, val.w_d12, val.w_d13, val.w_d14, val.w_d15 };
-			
-			alarm_distance = {val.a_d0, val.a_d1, val.a_d2, val.a_d3, val.a_d4,
-				val.a_d5, val.a_d6, val.a_d7, val.a_d8, val.a_d9, val.a_d10,
-				val.a_d11, val.a_d12, val.a_d13, val.a_d14, val.a_d15 };
 
-			enable_transmission = {val.ent_0, val.ent_1, val.ent_2, val.ent_3};
-			fire_interval_ms = {val.ft_0, val.ft_1, val.ft_2, val.ft_3};
-			sending_sensor = {val.sn_0, val.sn_1, val.sn_2, val.sn_3};
-			cross_echo_mode = {val.ee_0, val.ee_1, val.ee_2, val.ee_3};
+			if (val.serial_number != serial_number ||
+					val.hardware_version != hardware_version) {
+				ROS_WARN("Cannot configure serial number and hardware_version");
+				return;
+			}
+
+			active_sensors = {val.active_sensors_0, val.active_sensors_1, val.active_sensors_2, val.active_sensors_3, val.active_sensors_4,
+			val.active_sensors_5, val.active_sensors_6, val.active_sensors_7, val.active_sensors_8, val.active_sensors_9, val.active_sensors_10,
+			val.active_sensors_11, val.active_sensors_12, val.active_sensors_13, val.active_sensors_14, val.active_sensors_15 };
+		
+			warn_distance = {val.warn_distance_0, val.warn_distance_1, val.warn_distance_2, val.warn_distance_3, val.warn_distance_4,
+				val.warn_distance_5, val.warn_distance_6, val.warn_distance_7, val.warn_distance_8, val.warn_distance_9, val.warn_distance_10,
+				val.warn_distance_11, val.warn_distance_12, val.warn_distance_13, val.warn_distance_14, val.warn_distance_15 };
+			
+			alarm_distance = {val.alarm_distance_0, val.alarm_distance_1, val.alarm_distance_2, val.alarm_distance_3, val.alarm_distance_4,
+				val.alarm_distance_5, val.alarm_distance_6, val.alarm_distance_7, val.alarm_distance_8, val.alarm_distance_9, val.alarm_distance_10,
+				val.alarm_distance_11, val.alarm_distance_12, val.alarm_distance_13, val.alarm_distance_14, val.alarm_distance_15 };
+
+			enable_transmission = {val.enable_transmission_0, val.enable_transmission_1, val.enable_transmission_2, val.enable_transmission_3};
+			fire_interval_ms = {val.fire_interval_ms_0, val.fire_interval_ms_1, val.fire_interval_ms_2, val.fire_interval_ms_3};
+			sending_sensor = {val.sending_sensor_0, val.sending_sensor_1, val.sending_sensor_2, val.sending_sensor_3};
+			cross_echo_mode = {val.cross_echo_mode_0, val.cross_echo_mode_1, val.cross_echo_mode_2, val.cross_echo_mode_3};
 
 			can_device = val.can_device;
 			serial_port = val.serial_port;
 			topic_path = val.topic_path;
-			serial_number = val.serial_number;
-			hardware_version = val.hardware_version;
+
 			can_id = val.can_id;
 			can_baud_rate = val.can_baud_rate;
 			update_rate = val.update_rate;
