@@ -256,9 +256,9 @@ protected:
 				return;
 			}
 
-			active_sensors = {val.active_sensors_0, val.active_sensors_1, val.active_sensors_2, val.active_sensors_3, val.active_sensors_4,
-			val.active_sensors_5, val.active_sensors_6, val.active_sensors_7, val.active_sensors_8, val.active_sensors_9, val.active_sensors_10,
-			val.active_sensors_11, val.active_sensors_12, val.active_sensors_13, val.active_sensors_14, val.active_sensors_15 };
+			active_sensors = {val.active_sensor_0, val.active_sensor_1, val.active_sensor_2, val.active_sensor_3, val.active_sensor_4,
+			val.active_sensor_5, val.active_sensor_6, val.active_sensor_7, val.active_sensor_8, val.active_sensor_9, val.active_sensor_10,
+			val.active_sensor_11, val.active_sensor_12, val.active_sensor_13, val.active_sensor_14, val.active_sensor_15 };
 		
 			warn_distance = {val.warn_distance_0, val.warn_distance_1, val.warn_distance_2, val.warn_distance_3, val.warn_distance_4,
 				val.warn_distance_5, val.warn_distance_6, val.warn_distance_7, val.warn_distance_8, val.warn_distance_9, val.warn_distance_10,
