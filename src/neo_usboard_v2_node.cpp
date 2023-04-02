@@ -250,12 +250,6 @@ protected:
 	{
 		if(ros_params_initialized) {
 
-			if (val.serial_number != serial_number ||
-					val.hardware_version != hardware_version) {
-				ROS_WARN("Cannot configure serial number and hardware_version");
-				return;
-			}
-
 			active_sensors = {val.active_sensor_0, val.active_sensor_1, val.active_sensor_2, val.active_sensor_3, val.active_sensor_4,
 			val.active_sensor_5, val.active_sensor_6, val.active_sensor_7, val.active_sensor_8, val.active_sensor_9, val.active_sensor_10,
 			val.active_sensor_11, val.active_sensor_12, val.active_sensor_13, val.active_sensor_14, val.active_sensor_15 };
@@ -272,10 +266,6 @@ protected:
 			fire_interval_ms = {val.fire_interval_ms_0, val.fire_interval_ms_1, val.fire_interval_ms_2, val.fire_interval_ms_3};
 			sending_sensor = {val.sending_sensor_0, val.sending_sensor_1, val.sending_sensor_2, val.sending_sensor_3};
 			cross_echo_mode = {val.cross_echo_mode_0, val.cross_echo_mode_1, val.cross_echo_mode_2, val.cross_echo_mode_3};
-
-			can_device = val.can_device;
-			serial_port = val.serial_port;
-			topic_path = val.topic_path;
 
 			can_id = val.can_id;
 			can_baud_rate = val.can_baud_rate;
