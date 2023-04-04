@@ -123,7 +123,7 @@ protected:
 
 		set_timer_millis(1000, std::bind(&ROS_Node::request_config, this));
 
-		topicPub_usBoard = nh_.advertise<neo_msgs::USBoardV2>(topic_path + "/measuremenable_transmissions", 1);
+		topicPub_usBoard = nh_.advertise<neo_msgs::USBoardV2>(topic_path + "/measurements", 1);
 
     	server = new dynamic_reconfigure::Server<neo_usboard_v2::neo_usboard_v2Config>(nh_);	
 		dynamic_reconfigure::Server<neo_usboard_v2::neo_usboard_v2Config>::CallbackType cb=
