@@ -175,8 +175,14 @@ protected:
 	{
 		if(value->transmit_mode == pilot::usboard::USBoardConfig::TRANSMIT_MODE_REQUEST)
 		{
-			// enable request timer
-			set_timer_millis(update_interval_ms, std::bind(&ROS_Node::update, this));
+			if(!request_timer){
+				request_timer = set_timer_millis(update_interval_ms, std::bind(&ROS_Node::update, this));
+			}
+			request_timer->reset();
+		} else {
+			if(request_timer){
+				request_timer->stop();
+			}
 			
 		}
 		int i = 0;
@@ -185,6 +191,9 @@ protected:
 			if(sensor.active) {
 				sensor_group_enable[i / 4] = true;		// auto enable group for requests
 				topicPub_USRangeSensor[i] = nh_.advertise<sensor_msgs::Range>(topic_path + "/sensor" + std::to_string(i), 1);
+			} else {
+				senser_group_enable[i / 4] = false;
+				topicPub_USRangeSensor[i] = nullptr;
 			}
 			i++;
 		}
@@ -296,6 +305,7 @@ protected:
 
 private:
 	pilot::usboard::USBoardModuleClient usboard_sync;
+	std::shared_ptr<vnx::Timer> request_timer;
 
 	std::shared_ptr<const pilot::usboard::USBoardConfig> config;
 	dynamic_reconfigure::Server<neo_usboard_v2::neo_usboard_v2Config> *server;
