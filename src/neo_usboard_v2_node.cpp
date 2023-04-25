@@ -192,8 +192,7 @@ protected:
 				sensor_group_enable[i / 4] = true;		// auto enable group for requests
 				topicPub_USRangeSensor[i] = nh_.advertise<sensor_msgs::Range>(topic_path + "/sensor" + std::to_string(i), 1);
 			} else {
-				senser_group_enable[i / 4] = false;
-				topicPub_USRangeSensor[i] = nullptr;
+				sensor_group_enable[i / 4] = false;
 			}
 			i++;
 		}
