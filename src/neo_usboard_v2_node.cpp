@@ -294,6 +294,7 @@ protected:
 				try{
 					usboard_sync.send_config(new_config);
 					config = new_config;
+					publish(new_config, input_config);
 				}catch(const std::exception &err){
 					ROS_WARN("Sending USBoard config failed with: %s", err.what());
 				}
